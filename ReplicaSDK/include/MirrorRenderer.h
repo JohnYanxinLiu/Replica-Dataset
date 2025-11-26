@@ -100,12 +100,19 @@ class MirrorRenderer {
     if (!InView(mirror, cam))
       return;
     // render reflections to texture
+    const Eigen::Matrix4f reflMat = GetReflectionMatrix(mirror);
+    const pangolin::OpenGlMatrix mvMat = cam.GetModelViewMatrix();
+    const Eigen::Matrix4d mvEigen = Eigen::Map<const Eigen::Matrix<double,4,4,Eigen::ColMajor>>(mvMat.m);
+    const Eigen::Matrix4d reflectedMV = mvEigen * reflMat.cast<double>();
+    pangolin::OpenGlMatrix reflectedMVMat;
+    Eigen::Map<Eigen::Matrix<double,4,4,Eigen::ColMajor>>(reflectedMVMat.m) = reflectedMV;
     pangolin::OpenGlRenderState reflectCam(
-        cam.GetProjectionMatrix(), cam.GetModelViewMatrix() * GetReflectionMatrix(mirror));
+        cam.GetProjectionMatrix(), reflectedMVMat);
 
     // Check which side of the surface we're on to render the right clip plane
-    const Eigen::Vector4d t =
-        ((Eigen::Matrix4d)cam.GetModelViewMatrix().Inverse()).topRightCorner(4, 1);
+    const pangolin::OpenGlMatrix mvInv = cam.GetModelViewMatrix().Inverse();
+    const Eigen::Matrix4d mvInvEigen = Eigen::Map<const Eigen::Matrix<double,4,4,Eigen::ColMajor>>(mvInv.m);
+    const Eigen::Vector4d t = mvInvEigen.topRightCorner(4, 1);
     const double signFlip = mirror.Equation().cast<double>().dot(t) > 0 ? 1.0 : -1.0;
 
     Eigen::Vector4f plane = mirror.Equation();
@@ -182,7 +189,8 @@ class MirrorRenderer {
   }
 
   bool InView(const MirrorSurface& surface, const pangolin::OpenGlRenderState& cam) {
-    const Eigen::Matrix4f mvp = ((Eigen::Matrix4d)cam.GetProjectionModelViewMatrix()).cast<float>();
+    const pangolin::OpenGlMatrix mvpMat = cam.GetProjectionModelViewMatrix();
+    const Eigen::Matrix4f mvp = Eigen::Map<const Eigen::Matrix<double,4,4,Eigen::ColMajor>>(mvpMat.m).cast<float>();
 
     for (size_t i = 0; i < surface.Boundary_w().size(); i++) {
       Eigen::Vector4f p = mvp * Unproject(surface.Boundary_w()[i]);

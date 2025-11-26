@@ -1,5 +1,6 @@
 // Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 #pragma once
+#include <Eigen/Core>
 #include <pangolin/gl/gl.h>
 #include <pangolin/image/managed_image.h>
 #include <pangolin/utils/picojson.h>

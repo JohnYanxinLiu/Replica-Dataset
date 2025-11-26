@@ -10,7 +10,7 @@ set(PTEX_SHADER_DIR "${CMAKE_CURRENT_LIST_DIR}/shaders" CACHE PATH "Where the sh
 file(GLOB srcs_ptex ptex/*.cpp)
 file(GLOB hdrs include/*.h)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -msse2 -msse3 -Wall -std=c++11 -fopenmp -DSHADER_DIR=${PTEX_SHADER_DIR}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -msse2 -msse3 -Wall -std=c++14 -fopenmp -DSHADER_DIR=${PTEX_SHADER_DIR} -DHAVE_EPOXY")
 
 add_library(ptex SHARED
             ${srcs_ptex}
@@ -21,6 +21,8 @@ target_link_libraries(ptex
                       ${Eigen_LIBRARIES}
                       ${Pangolin_LIBRARIES}
                       ${dl_LIBRARIES}
+                      GL
+                      epoxy
                       stdc++fs
 )
 target_include_directories(ptex PUBLIC
@@ -41,7 +43,7 @@ target_link_libraries(ReplicaViewer
                       ${Pangolin_LIBRARIES}
                       ${dl_LIBRARIES}
                       GL
-                      GLEW
+                      epoxy
                       ptex
                       stdc++fs
 )
@@ -52,7 +54,7 @@ target_link_libraries(ReplicaRenderer
                       ${Pangolin_LIBRARIES}
                       ${dl_LIBRARIES}
                       GL
-                      GLEW
+                      epoxy
                       ptex
                       stdc++fs
 )

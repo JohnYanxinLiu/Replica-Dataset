@@ -156,17 +156,7 @@ EGLCtx::EGLCtx(const bool createCtx, const int cudaDevice, const bool createSurf
           "Can't bind EGL context");
     }
 
-    GLenum err = glewInit();
-
-#ifdef GLEW_ERROR_NO_GLX_DISPLAY
-    if (err == GLEW_ERROR_NO_GLX_DISPLAY) {
-        std::cout << "Can't initialize EGL GLEW GLX display, may crash!" << std::endl;
-    }
-    else 
-#endif
-    if (err != GLEW_OK) {
-        ASSERT(false, "Can't initialize EGL, glewInit failing completely.");
-    }
+    // Epoxy is used instead of GLEW, no initialization needed
 
     // Setup default OpenGL parameters
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
